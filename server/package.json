@@ -1,0 +1,22 @@
+{
+  "name": "trpc-server",
+  "version": "1.0.0",
+  "description": "This is an example project to learn trpc",
+  "main": "index.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "author": "Faraz Ahmad",
+  "license": "MIT",
+  "dependencies": {
+    "@trpc/server": "^10.45.2",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "typescript": "^5.7.3"
+  }
+}

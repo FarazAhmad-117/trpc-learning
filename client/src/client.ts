@@ -1,11 +1,41 @@
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
+import {
+  createTRPCProxyClient,
+  createWSClient,
+  httpBatchLink,
+  httpLink,
+  loggerLink,
+  splitLink,
+  wsLink,
+} from "@trpc/client";
 import { AppRouter } from "../../server/src/index";
+
+const wsClient = createWSClient({
+  url: "http://localhost:8000/trpc",
+});
 
 const client = createTRPCProxyClient<AppRouter>({
   links: [
-    httpBatchLink({
-      url: "http://localhost:8000/trpc",
+    loggerLink(),
+    splitLink({
+      condition: (op) => {
+        return op.type === "subscription";
+      },
+      true: wsLink({
+        client: wsClient,
+      }),
+      false: httpBatchLink({
+        url: "http://localhost:8000/trpc",
+        headers: {
+          Authorization: "Bearer faraz_ahmad",
+        },
+      }),
     }),
+    // httpLink({
+    //   url: "http://localhost:8000/trpc",
+    //   headers: {
+    //     Authorization: "Bearer faraz_ahmad",
+    //   },
+    // }),
   ],
 });
 
@@ -25,6 +55,17 @@ async function main() {
   //   name: "Faraz Ahmad",
   // });
   // console.log(user);
+
+  // await client.secretData.mutate({
+  //   username: "admin",
+  //   password: "password",
+  // });
+
+  client.users.onUpdate.subscribe(undefined, {
+    onData: (id) => {
+      console.log(`User ${id} updated!`);
+    },
+  });
 
   const result = await client.secretData.mutate({
     username: "admin",
